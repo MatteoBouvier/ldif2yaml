@@ -1,3 +1,4 @@
+import sys
 import json
 import yaml
 import typer
@@ -18,7 +19,6 @@ def get_dump_method(output_format: str) -> Callable:
 
 
 def parse(
-    file: Annotated[str, typer.Argument(help="file with LDIF data to parse")],
     tree: Annotated[
         bool, typer.Option("--tree", "-t", help="parse as tree structure")
     ] = False,
@@ -27,15 +27,14 @@ def parse(
     ] = "yaml",
 ) -> None:
     """
-    Parse LDIF data to YAML format.
+    Parse LDIF data to text formats.
     """
     parse_method = Parser_tree if tree else Parser_base
     dump_method = get_dump_method(output_format)
 
-    with open(file, "r") as input_file:
-        parser = parse_method(input_file, dump_method)
-        parser.parse()
-        parser.print()
+    parser = parse_method(sys.stdin, dump_method)
+    parser.parse()
+    parser.print()
 
 
 def main():
