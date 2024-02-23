@@ -1,12 +1,12 @@
 import sys
-import yaml
 from ldif import LDIFParser
 
 
-class LDIF2YAML(LDIFParser):
+class Parser(LDIFParser):
     def __init__(
         self,
         input_file,
+        dump_method,
         ignored_attr_types=None,
         max_entries=0,
         process_url_schemes=None,
@@ -17,12 +17,13 @@ class LDIF2YAML(LDIFParser):
         )
 
         self.data = {}
+        self.dump_method = dump_method
 
     def print(self) -> None:
-        yaml.dump(self.data, sys.stdout)
+        self.dump_method(self.data, sys.stdout)
 
 
-class LDIF2YAML_base(LDIF2YAML):
+class Parser_base(Parser):
     def handle(self, dn: str, entry: dict[str, list[bytes]]):
         self.data[dn] = {}
 
@@ -32,7 +33,7 @@ class LDIF2YAML_base(LDIF2YAML):
                 try:
                     decoded_values.append(value.decode("utf-8"))
                 except UnicodeDecodeError:
-                    decoded_values.append(value)
+                    decoded_values.append(str(value))
 
             if len(decoded_values) == 1:
                 self.data[dn][k] = decoded_values[0]
@@ -41,7 +42,7 @@ class LDIF2YAML_base(LDIF2YAML):
                 self.data[dn][k] = decoded_values
 
 
-class LDIF2YAML_tree(LDIF2YAML):
+class Parser_tree(Parser):
     def handle(self, dn: str, entry: dict[str, list[bytes]]):
         data_store = self.data
 
@@ -58,7 +59,7 @@ class LDIF2YAML_tree(LDIF2YAML):
                 try:
                     decoded_values.append(value.decode("utf-8"))
                 except UnicodeDecodeError:
-                    decoded_values.append(value)
+                    decoded_values.append(str(value))
 
             if len(decoded_values) == 1:
                 data_store[k] = decoded_values[0]
