@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ldifparse"
-version = "1.0.0a1"
+version = "1.0.0"
 description = "Parse LDIF data into YAML or JSON"
 authors = ["Matteo Bouvier <m.bouvier@vidium-solutions.com>"]
 license = "MIT"
